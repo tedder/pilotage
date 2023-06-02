@@ -9,6 +9,12 @@ import requests
 # http://pydub.com/
 # https://github.com/jiaaro/pydub/
 
+tz = pytz.timezone('America/Los_Angeles')
+start_time = tz.localize(datetime.datetime(2023,6,2,9,0,0)).astimezone(pytz.utc)
+PREFIX = 'kpdx/KPDX3-'
+LOC_LABELS = ['App-Dep-South']
+NUM_HOURS = 2
+
 def download_filename(url):
   local_filename = url.split('/')[-1]
   return local_filename
@@ -30,20 +36,16 @@ def download_file(url):
 # https://archive.liveatc.net/kgso/KGSO1-App-Dep-West-May-29-2023-0230Z.mp3
 # https://archive.liveatc.net/kgso/KGSO1-Twr-May-29-2023-0330Z.mp3
 
-tz = pytz.timezone('America/New_York')
-start_time = tz.localize(datetime.datetime(2023,5,26,17,0,0)).astimezone(pytz.utc)
-
-prefix = 'kgso/KGSO1-'
-for loc_label in ['App-Dep-South', 'App-Dep-West', 'Twr']:
+for loc_label in LOC_LABELS:
   concat_file = f"{loc_label}_concat.mp3"
   full_file = None
-  for i in range(0,6):
+  for i in range(0,NUM_HOURS):
     for j in [0,30]:
       t = start_time + datetime.timedelta(hours=i, minutes=j)
       #print(i)
       pt = t.strftime('%b-%d-%Y-%H%M')
       #print(f"t={pt}")
-      url = f'https://archive.liveatc.net/{prefix}{loc_label}-{pt}Z.mp3'
+      url = f'https://archive.liveatc.net/{PREFIX}{loc_label}-{pt}Z.mp3'
       print(url)
       loc_file = download_filename(url)
       if not os.path.exists(loc_file):
